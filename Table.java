@@ -195,8 +195,22 @@ public class Table
         if (! compatible (table2)) return null;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
+        
+        rows.addAll(this.tuples);
+        List <Comparable []> t2 = table2.tuples;
+        for (Comparable[] comparables : t2) {
+        	boolean hasSameTag = false;
+        	KeyType t2KeyType = new KeyType(comparables);
+			for (Comparable[] row : rows) {
+				KeyType rowKeyType = new KeyType(row);
+				if (t2KeyType.compareTo(rowKeyType) == 0) {
+					hasSameTag = true;
+				}
+			}
+			if (!hasSameTag) {
+				rows.add(comparables);
+			}
+		}
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
@@ -216,8 +230,24 @@ public class Table
         if (! compatible (table2)) return null;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
+        rows.addAll(this.tuples);
+        List <Comparable []> t2 = table2.tuples;
+        List <Comparable []> temp = new ArrayList <> ();
+        for (Comparable[] row : rows) {
+        	boolean hasSameTag = false;
+			KeyType rowKeyType = new KeyType(row);
+			for (Comparable[] comparables : t2) {
+				KeyType t2KeyType = new KeyType(comparables);
+				if (rowKeyType.compareTo(t2KeyType) == 0) {
+					hasSameTag = true;
+				}
+			}
+			if (hasSameTag) {
+				temp.add(row);
+			}
+		}
+        
+        rows.removeAll(temp);
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
