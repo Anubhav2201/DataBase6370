@@ -2,7 +2,7 @@
 /****************************************************************************************
  * @file  Table.java
  *
- * @author   John Miller
+ * @author   John Miller, Austin Apt, Mingkun Tao, Anubhav Nigam
  */
 
 import java.io.*;
@@ -212,6 +212,7 @@ public class Table
      *
      * #usage movie.union (show)
      *
+     * @author Mingkun Tao
      * @param table2  the rhs table in the union operation
      * @return  a table representing the union
      */
@@ -247,6 +248,7 @@ public class Table
      *
      * #usage movie.minus (show)
      *
+     * @author Mingkun Tao
      * @param table2  The rhs table in the minus operation
      * @return  a table representing the difference
      */
