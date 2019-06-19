@@ -283,6 +283,8 @@ public class Table
      * are compared requiring attributes1 to equal attributes2.  Disambiguate attribute
      * names by append "2" to the end of any duplicate attribute name.
      *
+     *@author Anubhav Nigam
+     *
      * #usage movie.join ("studioNo", "name", studio)
      *
      * @param attribute1  the attributes of this table to be compared (Foreign Key)
@@ -300,7 +302,11 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        int[] matchedColIndex1 = match(t_attrs);
+        int[] matchedColIndex2 = match(u_attrs);
+
+        tuples.forEach(tab1->rows.addAll(table2.tuples.stream().filter(tab2->areEqual(tab1,matchedColIndex1,tab2,matchedColIndex2)).map(_row->concat(tab1,_row)).collect(Collectors.toList())));
+        			
 
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
@@ -310,6 +316,8 @@ public class Table
      * Join this table and table2 by performing an "natural join".  Tuples from both tables
      * are compared requiring common attributes to be equal.  The duplicate column is also
      * eliminated.
+     *
+     * @author Anubhav Nigam
      *
      * #usage movieStar.join (starsIn)
      *
@@ -321,13 +329,79 @@ public class Table
         out.println ("RA> " + name + ".join (" + table2.name + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
-
-        // FIX - eliminate duplicate columns
-        return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
+        List <Comparable []> rowsIntermediate = new ArrayList <> ();
+        // finding out the common attribute from both tables
+        List<String> matchedAttribute = Arrays.asList(attribute).stream().filter(a->Arrays.asList(table2.attribute).contains(a)).collect(Collectors.toList());
+        // finding out uncommon attribute from Table1
+        List<String> unMatchedAttributeTable1 = Arrays.asList(attribute).stream().filter(a->!Arrays.asList(table2.attribute).contains(a)).collect(Collectors.toList());
+        //finding out uncommon attribute in Table2
+        List<String> unMatchedAttributeTable2 = Arrays.asList(table2.attribute).stream().filter(a->!Arrays.asList(attribute).contains(a)).collect(Collectors.toList());
+        int length = (matchedAttribute.size()+unMatchedAttributeTable1.size()+unMatchedAttributeTable2.size());
+        //Concatenating all three attribute list and storing them in array of String 
+        String[] finalAttributes = concatenateLists(matchedAttribute,unMatchedAttributeTable1,unMatchedAttributeTable2).toArray(new String[length]);
+        //match attribute and domain to return index of matched column
+        int[] matchedColIndex1 = match(matchedAttribute.toArray(new String[matchedAttribute.size()]));
+        int[] matchedColIndex2 = table2.match(matchedAttribute.toArray(new String[matchedAttribute.size()]));
+        //adding all the filtered tuples in list which have all the attribute from both the table 
+        tuples.forEach(tab1->rowsIntermediate.addAll(table2.tuples.stream().filter(tab2->areEqual(tab1,matchedColIndex1,tab2,matchedColIndex2)).map(_row->concat(tab1,_row)).collect(Collectors.toList())));
+        //eliminating attributes that are duplicate
+        rows=rowsIntermediate.stream().map(row->extract(row, finalAttributes)).collect(Collectors.toList());
+        return new Table (name + count++, finalAttributes,
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
     } // join
+    
+    /************************************************************************************
+     * Compares tuples from both the table on the basis of matched column index
+     * and check for equality
+     * 
+     * @author Anubhav Nigam
+     * 
+     * #usage areEqual (starsIn.tuple, matchedColIndex1, movieStar.tuple, matchedColIndex2)
+     *
+     * @param table1 , matched column index in table1, table2 , matched column index in table2
+     * @return  boolean on the basis of equality check of tuples
+     */
+    private boolean areEqual(Comparable[] tab1,int[] matchedColIndex1,Comparable[] tab2,int[] matchedColIndex2){
+    	for(int i=0;i<matchedColIndex1.length;i++){
+    		if(!tab1[matchedColIndex1[i]].equals(tab2[matchedColIndex2[i]])){
+    			return false;
+    		}
+    	}
+    	return true;
+    }
+    
+    /************************************************************************************
+     * concat and map two comparable
+     * 
+     * @author Anubhav Nigam
+     * 
+     * #usage concat (table1.tuple, table2.tuple)
+     *
+     * @param list1, list2
+     * @return comparable list
+     */
+    private Comparable[] concat(Comparable[] tuple,Comparable[] row){
+    	return ArrayUtil.concat(tuple, row);
+    }
+    
+    /************************************************************************************
+     * Concatenate multiple lists
+     * 
+     * @author Anubhav Nigam
+     * 
+     * #usage concatenateLists (starsIn, movieStar, movie)
+     *
+     * @param list1, list2, list3
+     * @return concatenated list
+     */
+    
+    public static<T> List<T> concatenateLists(List<T>... lists)
+    {
+    	return Stream.of(lists)
+    				.flatMap(x -> x.stream())
+    				.collect(Collectors.toList());
+    }
+    
 
     /************************************************************************************
      * Return the column position for the given attribute name.
