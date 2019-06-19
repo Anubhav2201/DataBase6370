@@ -141,10 +141,27 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
-
-        return new Table (name + count++, attrs, colDomain, newKey, rows);
+        int [] colPos = match (attrs); //returns array of column index positions
+	    
+	    List <Comparable []> subset = new ArrayList <> ();
+	    boolean matched=false;
+	    int len = tuples.size();
+	   
+	    //if (Arrays.asList (newKey).containsAll (Arrays.asList (key)))
+	    for (int i = 0; i < len; i++) 
+            subset.add(extract((tuples.get(i)), attrs));
+	    //now remove duplicates 
+	    for (int j=0; j<len; j++) {
+	    	for (int k=j+1; k<len+1; k++) {
+	    		if(k==len)
+	    			rows.add(subset.get(j));
+	    		else if((subset.get(j)).equals(subset.get(k)))
+	    			break;
+	    	}	
+	    }	        
+	    return new Table (name + count++, attrs, colDomain, newKey, rows);  
     } // project
+
 
     /************************************************************************************
      * Select the tuples satisfying the given predicate (Boolean function).
@@ -175,11 +192,21 @@ public class Table
         out.println ("RA> " + name + ".select (" + keyVal + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
+	int len = tuples.size();
+	int [] colPos = match (key);
+	int kIndex = colPos[0];
 
-        //  T O   B E   I M P L E M E N T E D 
+	System.out.println(kIndex);
 
-        return new Table (name + count++, attribute, domain, key, rows);
-    } // select
+	for (int i = 0; i < len; i++) {
+		System.out.println(i);
+		KeyType key1 = new KeyType (tuples.get(i)[kIndex]);
+		if (keyVal.equals(key1)) {
+			rows.add(tuples.get(i));
+		}
+	}		
+	return new Table (name + count++, attribute, domain, key, rows);
+	} // select
 
     /************************************************************************************
      * Union this table and table2.  Check that the two tables are compatible.
