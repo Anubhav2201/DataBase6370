@@ -129,6 +129,7 @@ public class Table
      *
      * #usage movie.project ("title year studioNo")
      *
+     * @author Austin Apt
      * @param attributes  the attributes to project onto
      * @return  a table of projected tuples
      */
@@ -184,6 +185,7 @@ public class Table
      * Select the tuples satisfying the given key predicate (key = value).  Use an index
      * (Map) to retrieve the tuple with the given key value.
      *
+     * @author Austin Apt
      * @param keyVal  the given key value
      * @return  a table with the tuple satisfying the key predicate
      */
@@ -196,10 +198,7 @@ public class Table
 	int [] colPos = match (key);
 	int kIndex = colPos[0];
 
-	System.out.println(kIndex);
-
 	for (int i = 0; i < len; i++) {
-		System.out.println(i);
 		KeyType key1 = new KeyType (tuples.get(i)[kIndex]);
 		if (keyVal.equals(key1)) {
 			rows.add(tuples.get(i));
