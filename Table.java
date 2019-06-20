@@ -141,11 +141,8 @@ public class Table
         String [] newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        int [] colPos = match (attrs); //returns array of column index positions
-	    
+        
 	    List <Comparable []> subset = new ArrayList <> ();
-	    boolean matched=false;
 	    int len = tuples.size();
 	   
 	    //if (Arrays.asList (newKey).containsAll (Arrays.asList (key)))
@@ -194,18 +191,27 @@ public class Table
         out.println ("RA> " + name + ".select (" + keyVal + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
-	int len = tuples.size();
-	int [] colPos = match (key);
-	int kIndex = colPos[0];
-
-	for (int i = 0; i < len; i++) {
-		KeyType key1 = new KeyType (tuples.get(i)[kIndex]);
-		if (keyVal.equals(key1)) {
-			rows.add(tuples.get(i));
-		}
-	}		
-	return new Table (name + count++, attribute, domain, key, rows);
-	} // select
+        
+        List <Comparable []> compKey  = new ArrayList <> ();
+              
+		int len = tuples.size();
+		int [] colPos = match (key);
+		
+		for (int k=0; k<len; k++)
+			compKey.add(extract((tuples.get(k)), key));
+	
+		for (int i = 0; i < len; i++) {
+			KeyType key1 = new KeyType (compKey.get(i));
+			System.out.println(key1);
+			for (int j=0; j<colPos.length; j++) {
+				if (keyVal.toString().equals(key1.toString())) {
+					rows.add(tuples.get(i));
+					break;
+				}
+			}
+		}		
+		return new Table (name + count++, attribute, domain, key, rows);
+		} // select
 
     /************************************************************************************
      * Union this table and table2.  Check that the two tables are compatible.
