@@ -13,6 +13,9 @@ Challenges:
 Extensively testing the project within a short period of time was a challenge.
 
 
-
 Javadoc:
 Generated java doc has been included inside of the javadoc directory.
+
+Compilation:
+1. Compile the four .java files into one package.
+2. Use MovieDB.java as the executable. 
