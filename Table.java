@@ -182,6 +182,8 @@ public class Table
      * Select the tuples satisfying the given key predicate (key = value).  Use an index
      * (Map) to retrieve the tuple with the given key value.
      *
+     * Able to accept compound key values. ex: "name gender"
+     *
      * @author Austin Apt
      * @param keyVal  the given key value
      * @return  a table with the tuple satisfying the key predicate
