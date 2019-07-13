@@ -1,4 +1,4 @@
-
+package p3;
 /****************************************************************************************
  * @file  Table.java
  *
@@ -74,7 +74,7 @@ public class Table
     
     private final Map <KeyType, Comparable []> bpIndex;
     
-//    private final Map <KeyType, Comparable []> linIndex;
+    private final Map <KeyType, Comparable []> linIndex;
     
     //----------------------------------------------------------------------------------
     // Constructors
@@ -96,8 +96,8 @@ public class Table
         key       = _key;
         tuples    = new ArrayList <> ();
         index     = new TreeMap<>();  
-        bpIndex   = new BpTreeMap<>(KeyType.class, Comparable [].class);       // also try BPTreeMap, LinHashMap or ExtHashMap
-//        linIndex  = new LinHashMap<>(KeyType.class, Comparable [].class);
+        bpIndex   = new BpTreeMap<>(KeyType.class, Comparable [].class);     
+        linIndex  = new LinHashMap<>(KeyType.class, Comparable [].class);
 
     } // constructor
 
@@ -120,7 +120,7 @@ public class Table
         tuples    = _tuples;
         index     =  new TreeMap<>();
         bpIndex   = new BpTreeMap<>(KeyType.class, Comparable [].class);       // also try BPTreeMap, LinHashMap or ExtHashMap
-//        linIndex  = new LinHashMap<>(KeyType.class, Comparable [].class, 11);
+        linIndex  = new LinHashMap<>(KeyType.class, Comparable [].class);
     } // constructor
 
     /************************************************************************************
@@ -210,29 +210,30 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         rows.add(bpIndex.get(keyVal));
+        //rows.add(linIndex.get(keyVal));
 
         return new Table (name + count++, attribute, domain, key, rows);
         
     } // select
 
     /************************************************************************************
-     * Union this table and table2.  Check that the two tables are compatible.
+     * Union this table and table.  Check that the two tables are compatible.
      *
      * #usage movie.union (show)
      *
      * @author Mingkun Tao
-     * @param table2  the rhs table in the union operation
+     * @param table  the rhs table in the union operation
      * @return  a table representing the union
      */
-    public Table union (Table table2)
+    public Table union (Table table)
     {
-        out.println ("RA> " + name + ".union (" + table2.name + ")");
-        if (! compatible (table2)) return null;
+        out.println ("RA> " + name + ".union (" + table.name + ")");
+        if (! compatible (table)) return null;
 
         List <Comparable []> rows = new ArrayList <> ();
 
         rows.addAll(this.tuples);
-        List <Comparable []> t2 = table2.tuples;
+        List <Comparable []> t2 = table.tuples;
         for (Comparable[] comparables : t2) {
         	boolean hasSameTag = false;
         	KeyType t2KeyType = new KeyType(comparables);
@@ -251,24 +252,24 @@ public class Table
     } // union
 
     /************************************************************************************
-     * Take the difference of this table and table2.  Check that the two tables are
+     * Take the difference of this table and table.  Check that the two tables are
      * compatible.
      *
      * #usage movie.minus (show)
      *
      * @author Mingkun Tao
-     * @param table2  The rhs table in the minus operation
+     * @param table  The rhs table in the minus operation
      * @return  a table representing the difference
      */
-    public Table minus (Table table2)
+    public Table minus (Table table)
     {
-        out.println ("RA> " + name + ".minus (" + table2.name + ")");
-        if (! compatible (table2)) return null;
+        out.println ("RA> " + name + ".minus (" + table.name + ")");
+        if (! compatible (table)) return null;
 
         List <Comparable []> rows = new ArrayList <> ();
 
         rows.addAll(this.tuples);
-        List <Comparable []> t2 = table2.tuples;
+        List <Comparable []> t2 = table.tuples;
         List <Comparable []> temp = new ArrayList <> ();
         for (Comparable[] row : rows) {
         	boolean hasSameTag = false;
@@ -290,7 +291,7 @@ public class Table
     } // minus
 
     /************************************************************************************
-     * Join this table and table2 by performing an "equi-join".  Tuples from both tables
+     * Join this table and table by performing an "equi-join".  Tuples from both tables
      * are compared requiring attributes1 to equal attributes2.  Disambiguate attribute
      * names by append "2" to the end of any duplicate attribute name.
      *
@@ -299,14 +300,14 @@ public class Table
      * @author Anubhav Nigam
      *
      * @param attribute1  the attributes of this table to be compared (Foreign Key)
-     * @param attribute2  the attributes of table2 to be compared (Primary Key)
-     * @param table2      the rhs table in the join operation
+     * @param attribute2  the attributes of table to be compared (Primary Key)
+     * @param table      the rhs table in the join operation
      * @return  a table with tuples satisfying the equality predicate
      */
-    public Table join (String attributes1, String attributes2, Table table2)
+    public Table join (String attributes1, String attributes2, Table table)
     {
         out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
-                + table2.name + ")");
+                + table.name + ")");
 
         String [] t_attrs = attributes1.split (" ");
         String [] u_attrs = attributes2.split (" ");
@@ -316,15 +317,15 @@ public class Table
         int[] matchedColIndex1 = match(t_attrs);
         int[] matchedColIndex2 = match(u_attrs);
 
-        tuples.forEach(tab1->rows.addAll(table2.tuples.stream().filter(tab2->areEqual(tab1,matchedColIndex1,tab2,matchedColIndex2)).map(_row->concat(tab1,_row)).collect(Collectors.toList())));
+        tuples.forEach(tab1->rows.addAll(table.tuples.stream().filter(tab2->areEqual(tab1,matchedColIndex1,tab2,matchedColIndex2)).map(_row->concat(tab1,_row)).collect(Collectors.toList())));
 
 
-        return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                ArrayUtil.concat (domain, table2.domain), key, rows);
+        return new Table (name + count++, ArrayUtil.concat (attribute, table.attribute),
+                ArrayUtil.concat (domain, table.domain), key, rows);
     } // join
 
     /************************************************************************************
-     * Join this table and table2 by performing an "natural join".  Tuples from both tables
+     * Join this table and table by performing an "natural join".  Tuples from both tables
      * are compared requiring common attributes to be equal.  The duplicate column is also
      * eliminated.
      *
@@ -332,35 +333,35 @@ public class Table
      *
      * @author Anubhav Nigam
      *
-     * @param table2  the rhs table in the join operation
+     * @param table  the rhs table in the join operation
      * @return  a table with tuples satisfying the equality predicate
      */
-    public Table join (Table table2)
+    public Table join (Table table)
     {
-        out.println ("RA> " + name + ".join (" + table2.name + ")");
+        out.println ("RA> " + name + ".join (" + table.name + ")");
 
-        out.println ("RA> " + name + ".join (" + table2.name + ")");
+        out.println ("RA> " + name + ".join (" + table.name + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
         List <Comparable []> rowsIntermediate = new ArrayList <> ();
         // finding out the common attribute from both tables
-        List<String> matchedAttribute = Arrays.asList(attribute).stream().filter(a->Arrays.asList(table2.attribute).contains(a)).collect(Collectors.toList());
+        List<String> matchedAttribute = Arrays.asList(attribute).stream().filter(a->Arrays.asList(table.attribute).contains(a)).collect(Collectors.toList());
         // finding out uncommon attribute from Table1
-        List<String> unMatchedAttributeTable1 = Arrays.asList(attribute).stream().filter(a->!Arrays.asList(table2.attribute).contains(a)).collect(Collectors.toList());
-        //finding out uncommon attribute in Table2
-        List<String> unMatchedAttributeTable2 = Arrays.asList(table2.attribute).stream().filter(a->!Arrays.asList(attribute).contains(a)).collect(Collectors.toList());
-        int length = (matchedAttribute.size()+unMatchedAttributeTable1.size()+unMatchedAttributeTable2.size());
+        List<String> unMatchedAttributeTable1 = Arrays.asList(attribute).stream().filter(a->!Arrays.asList(table.attribute).contains(a)).collect(Collectors.toList());
+        //finding out uncommon attribute in table
+        List<String> unMatchedAttributetable = Arrays.asList(table.attribute).stream().filter(a->!Arrays.asList(attribute).contains(a)).collect(Collectors.toList());
+        int length = (matchedAttribute.size()+unMatchedAttributeTable1.size()+unMatchedAttributetable.size());
         //Concatenating all three attribute list and storing them in array of String
-        String[] finalAttributes = concatenateLists(matchedAttribute,unMatchedAttributeTable1,unMatchedAttributeTable2).toArray(new String[length]);
+        String[] finalAttributes = concatenateLists(matchedAttribute,unMatchedAttributeTable1,unMatchedAttributetable).toArray(new String[length]);
         //match attribute and domain to return index of matched column
         int[] matchedColIndex1 = match(matchedAttribute.toArray(new String[matchedAttribute.size()]));
-        int[] matchedColIndex2 = table2.match(matchedAttribute.toArray(new String[matchedAttribute.size()]));
+        int[] matchedColIndex2 = table.match(matchedAttribute.toArray(new String[matchedAttribute.size()]));
         //adding all the filtered tuples in list which have all the attribute from both the table
-        tuples.forEach(tab1->rowsIntermediate.addAll(table2.tuples.stream().filter(tab2->areEqual(tab1,matchedColIndex1,tab2,matchedColIndex2)).map(_row->concat(tab1,_row)).collect(Collectors.toList())));
+        tuples.forEach(tab1->rowsIntermediate.addAll(table.tuples.stream().filter(tab2->areEqual(tab1,matchedColIndex1,tab2,matchedColIndex2)).map(_row->concat(tab1,_row)).collect(Collectors.toList())));
         //eliminating attributes that are duplicate
         rows=rowsIntermediate.stream().map(row->extract(row, finalAttributes)).collect(Collectors.toList());
         return new Table (name + count++, finalAttributes,
-                ArrayUtil.concat (domain, table2.domain), key, rows);
+                ArrayUtil.concat (domain, table.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -378,7 +379,7 @@ public class Table
      *
      * #usage areEqual (starsIn.tuple, matchedColIndex1, movieStar.tuple, matchedColIndex2)
      *
-     * @param table1 , matched column index in table1, table2 , matched column index in table2
+     * @param table1 , matched column index in table1, table , matched column index in table
      * @return  boolean on the basis of equality check of tuples
      */
     private boolean areEqual(Comparable[] tab1,int[] matchedColIndex1,Comparable[] tab2,int[] matchedColIndex2){
@@ -395,7 +396,7 @@ public class Table
      *
      *
      *
-     * #usage concat (table1.tuple, table2.tuple)
+     * #usage concat (table1.tuple, table.tuple)
      *
      * @author Anubhav Nigam
      * @param list1, list2
@@ -549,20 +550,20 @@ public class Table
     //----------------------------------------------------------------------------------
 
     /************************************************************************************
-     * Determine whether the two tables (this and table2) are compatible, i.e., have
+     * Determine whether the two tables (this and table) are compatible, i.e., have
      * the same number of attributes each with the same corresponding domain.
      *
-     * @param table2  the rhs table
+     * @param table  the rhs table
      * @return  whether the two tables are compatible
      */
-    private boolean compatible (Table table2)
+    private boolean compatible (Table table)
     {
-        if (domain.length != table2.domain.length) {
+        if (domain.length != table.domain.length) {
             out.println ("compatible ERROR: table have different arity");
             return false;
         } // if
         for (int j = 0; j < domain.length; j++) {
-            if (domain [j] != table2.domain [j]) {
+            if (domain [j] != table.domain [j]) {
                 out.println ("compatible ERROR: tables disagree on domain " + j);
                 return false;
             } // if

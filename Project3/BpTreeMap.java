@@ -1,4 +1,4 @@
-
+package p3;
 
 /************************************************************************************
  * @file BpTreeMap.java
@@ -176,10 +176,10 @@ public class BpTreeMap <K extends Comparable <K>, V>
         }
 
         while (current != null){
-			for (int i = 0; i < current.nKeys; i++) {//迭代取出叶子节点上所有的值
+			for (int i = 0; i < current.nKeys; i++) {
 				enSet.add(new AbstractMap.SimpleEntry<>(current.key[i], (V) current.ref[i]));
 			}
-			current = (Node) current.ref[current.nKeys];//迭代完毕后 把n设置为兄弟节点 继续迭代
+			current = (Node) current.ref[current.nKeys];
 		}
         return enSet;
     } // entrySet
