@@ -1,3 +1,5 @@
+package p4;
+
 
 /*****************************************************************************************
  * @file  KeyType.java
@@ -88,7 +90,7 @@ public class KeyType
         for (int i = 0; i < key.length; i++) s += " " + key [i];
         return s + (" )");
     } // toString
-
+    
     /*************************************************************************************
      * The main method is used for testing purposes only.
      * @param args  the command-line arguments
