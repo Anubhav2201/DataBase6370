@@ -2,3 +2,10 @@
 long a=System.currentTimeMillis();
 //put the code that you wanna measuring the time 
 System.out.println("\r<br> consuming time : "+(System.currentTimeMillis()-a)/1000f+" second ");
+
+
+StopWatch stopwatch = new StopWatch(); 
+stopwatch.start(); 
+... some code... 
+stopwatch.stop(); 
+long timeTaken = stopWatch.getTime() 
