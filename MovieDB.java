@@ -1,4 +1,4 @@
-
+package project3;
 /*****************************************************************************************
  * @file  MovieDB.java
  *
@@ -39,6 +39,39 @@ class MovieDB
 
         Table studio = new Table ("studio", "name address presNo",
                                             "String String Integer", "name");
+        TupleGeneratorImpl test = new TupleGeneratorImpl ();
+        
+        test.addRelSchema ("movie", "title year length genre studioName producerNo",
+                "String Integer Integer String String Integer", "title year",
+                new String [][] {{ "studioName", "studio", "name" },
+        		{"producerNo", "movieExec","certNo"}});
+        
+        test.addRelSchema ("cinema", "title year length genre studioName producerNo",
+                "String Integer Integer String String Integer", "title year",
+                new String [][] {{ "studioName", "studio", "name" },
+        		{"producerNo", "movieExec","certNo"}});
+        
+        test.addRelSchema ("movieStar", "name address gender birthdate",
+                "String String Character String", "name", null);
+        
+        test.addRelSchema ("starsIn", "movieTitle movieYear starName",
+                "String Integer String", "movieTitle movieYear starName", 
+                new String [][] {{ "movieTitle movieYear", "movie", "title year" },
+        		{ "movieTitle movieYear", "cinema", "title year"},
+        		{"starName", "movieStar", "name"}});
+        
+        test.addRelSchema ("movieExec", "certNo name address fee",
+                "Integer String String Float", "certNo", null);
+        
+        test.addRelSchema ("studio", "name address presNo",
+                "String String Integer", "name", null);
+        
+        String[] tables = new String [] { "movie", "cinema", "movieStar","starsIn","movieExec","studio"};
+        int[] tups = new int [] { 10000, 10000, 5000, 5000, 300, 200 };
+        Comparable[][][] resultTest = test.generate (tups);
+        
+        for (int i = 0; i < resultTest.length; i++) {
+       
 
         Comparable [] film0 = { "Star_Wars", 1977, 124, "sciFi", "Fox", 12345 };
         Comparable [] film1 = { "Star_Wars_2", 1980, 124, "sciFi", "Fox", 12345 };
