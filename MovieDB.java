@@ -7,6 +7,8 @@ package project3;
 
 import static java.lang.System.out;
 
+import java.util.ArrayList;
+
 /*****************************************************************************************
  * The MovieDB class makes a Movie Database.  It serves as a template for making other
  * databases.  See "Database Systems: The Complete Book", second edition, page 26 for more
@@ -41,6 +43,17 @@ class MovieDB
                                             "String String Integer", "name");
         TupleGeneratorImpl test = new TupleGeneratorImpl ();
         
+       
+        
+        test.addRelSchema ("movieStar", "name address gender birthdate",
+                "String String Character String", "name", null);
+            
+        test.addRelSchema ("movieExec", "certNo name address fee",
+                "Integer String String Float", "certNo", null);
+        
+        test.addRelSchema ("studio", "name address presNo",
+                "String String Integer", "name", null);
+        
         test.addRelSchema ("movie", "title year length genre studioName producerNo",
                 "String Integer Integer String String Integer", "title year",
                 new String [][] {{ "studioName", "studio", "name" },
@@ -51,72 +64,86 @@ class MovieDB
                 new String [][] {{ "studioName", "studio", "name" },
         		{"producerNo", "movieExec","certNo"}});
         
-        test.addRelSchema ("movieStar", "name address gender birthdate",
-                "String String Character String", "name", null);
-        
         test.addRelSchema ("starsIn", "movieTitle movieYear starName",
                 "String Integer String", "movieTitle movieYear starName", 
                 new String [][] {{ "movieTitle movieYear", "movie", "title year" },
         		{ "movieTitle movieYear", "cinema", "title year"},
         		{"starName", "movieStar", "name"}});
         
-        test.addRelSchema ("movieExec", "certNo name address fee",
-                "Integer String String Float", "certNo", null);
-        
-        test.addRelSchema ("studio", "name address presNo",
-                "String String Integer", "name", null);
-        
-        String[] tables = new String [] { "movie", "cinema", "movieStar","starsIn","movieExec","studio"};
-        int[] tups = new int [] { 10000, 10000, 5000, 5000, 300, 200 };
+        String[] tables = new String [] { "movieStar", "movieExec", "studio","movie","cinema","starsIn"};
+        int[] tups = new int [] {100,100,100, 100, 100, 100 };
         Comparable[][][] resultTest = test.generate (tups);
         
+        ArrayList<Table> list=new ArrayList<Table>();
+        list.add(movieStar);
+        list.add(movieExec);
+        list.add(studio);
+        list.add(movie);
+        list.add(cinema);
+        list.add(starsIn);
+        
         for (int i = 0; i < resultTest.length; i++) {
-       
+            out.print (resultTest [i]+ ",");
+            for (int j = 0; j < resultTest [i].length; j++) {
+                for (int k = 0; k < resultTest [i][j].length; k++) {
+                	out.print (resultTest[k] + ",");
+                	Comparable[] result1 = resultTest[i][k];
+                	list.get(i).insert(result1);
+                } // for
+            } // for
+        } // for
+    
 
-        Comparable [] film0 = { "Star_Wars", 1977, 124, "sciFi", "Fox", 12345 };
-        Comparable [] film1 = { "Star_Wars_2", 1980, 124, "sciFi", "Fox", 12345 };
-        Comparable [] film2 = { "Rocky", 1985, 200, "action", "Universal", 12125 };
-        Comparable [] film3 = { "Rambo", 1978, 100, "action", "Universal", 32355 };
-        out.println ();
-        movie.insert (film0);
-        movie.insert (film1);
-        movie.insert (film2);
-        movie.insert (film3);
+//        Comparable [] film0 = { "Star_Wars", 1977, 124, "sciFi", "Fox", 12345 };
+//        Comparable [] film1 = { "Star_Wars_2", 1980, 124, "sciFi", "Fox", 12345 };
+//        Comparable [] film2 = { "Rocky", 1985, 200, "action", "Universal", 12125 };
+//        Comparable [] film3 = { "Rambo", 1978, 100, "action", "Universal", 32355 };
+//        out.println ();
+//        movie.insert (film0);
+//        movie.insert (film1);
+//        movie.insert (film2);
+//        movie.insert (film3);
+        out.println ("Movie");
         movie.print ();
 
-        Comparable [] film4 = { "Galaxy_Quest", 1999, 104, "comedy", "DreamWorks", 67890 };
-        out.println ();
-        cinema.insert (film2);
-        cinema.insert (film3);
-        cinema.insert (film4);
+//        Comparable [] film4 = { "Galaxy_Quest", 1999, 104, "comedy", "DreamWorks", 67890 };
+//        out.println ();
+//        cinema.insert (film2);
+//        cinema.insert (film3);
+//        cinema.insert (film4);
+        out.println ("Cinema");
         cinema.print ();
 
-        Comparable [] star0 = { "Carrie_Fisher", "Hollywood", 'F', "9/9/99" };
-        Comparable [] star1 = { "Mark_Hamill", "Brentwood", 'M', "8/8/88" };
-        Comparable [] star2 = { "Harrison_Ford", "Beverly_Hills", 'M', "7/7/77" };
-        out.println ();
-        movieStar.insert (star0);
-        movieStar.insert (star1);
-        movieStar.insert (star2);
+//        Comparable [] star0 = { "Carrie_Fisher", "Hollywood", 'F', "9/9/99" };
+//        Comparable [] star1 = { "Mark_Hamill", "Brentwood", 'M', "8/8/88" };
+//        Comparable [] star2 = { "Harrison_Ford", "Beverly_Hills", 'M', "7/7/77" };
+//        out.println ();
+//        movieStar.insert (star0);
+//        movieStar.insert (star1);
+//        movieStar.insert (star2);
+        out.println ("MovieStar");
         movieStar.print ();
 
-        Comparable [] cast0 = { "Star_Wars", 1977, "Carrie_Fisher" };
-        out.println ();
-        starsIn.insert (cast0);
+//        Comparable [] cast0 = { "Star_Wars", 1977, "Carrie_Fisher" };
+//        out.println ();
+//        starsIn.insert (cast0);
+        out.println ("starsIn");
         starsIn.print ();
 
-        Comparable [] exec0 = { 9999, "S_Spielberg", "Hollywood", 10000.00 };
+//        Comparable [] exec0 = { 9999, "S_Spielberg", "Hollywood", 10000.00 };
         out.println ();
-        movieExec.insert (exec0);
+//        movieExec.insert (exec0);
+        out.println ("movieExec");
         movieExec.print ();
 
-        Comparable [] studio0 = { "Fox", "Los_Angeles", 7777 };
-        Comparable [] studio1 = { "Universal", "Universal_City", 8888 };
-        Comparable [] studio2 = { "DreamWorks", "Universal_City", 9999 };
+//        Comparable [] studio0 = { "Fox", "Los_Angeles", 7777 };
+//        Comparable [] studio1 = { "Universal", "Universal_City", 8888 };
+//        Comparable [] studio2 = { "DreamWorks", "Universal_City", 9999 };
         out.println ();
-        studio.insert (studio0);
-        studio.insert (studio1);
-        studio.insert (studio2);
+//        studio.insert (studio0);
+//        studio.insert (studio1);
+//        studio.insert (studio2);
+        out.println ("studio");
         studio.print ();
 
         movie.save ();
