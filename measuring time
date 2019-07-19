@@ -1,0 +1,4 @@
+
+long a=System.currentTimeMillis();
+//put the code that you wanna measuring the time 
+System.out.println("\r<br> consuming time : "+(System.currentTimeMillis()-a)/1000f+" second ");
