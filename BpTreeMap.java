@@ -32,7 +32,7 @@ public class BpTreeMap <K extends Comparable <K>, V>
     /** The maximum fanout (number of children) for a B+Tree node.
      *  May wish to increase for better performance for Program 3.
      */
-    private static final int ORDER = 20;
+    private static final int ORDER = 5;
 
     /** The maximum fanout (number of children) for a big B+Tree node.
      */
@@ -360,7 +360,7 @@ public class BpTreeMap <K extends Comparable <K>, V>
                 if (n == root && rt != null) {
                     root = makeRoot (n, n.key[n.nKeys-1], rt);               // make a new root
                 } else if (rt != null) {
-                    hasSplit = true;                                         // indicate an unhandled split
+                    hasSplit = false;                                         // indicate an unhandled split
                 } // if
             } // if
 
@@ -390,7 +390,7 @@ public class BpTreeMap <K extends Comparable <K>, V>
                 }
             }
         }
-        if( DEBUG ) print( root, 0 );
+      //  if( DEBUG ) print( root, 0 );
         return rt;                            
 
     } // insert
