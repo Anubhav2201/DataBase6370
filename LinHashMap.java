@@ -141,70 +141,69 @@ implements Serializable, Cloneable, Map <K, V>
 	 */
 	public V put (K key, V value)
 	{
-		int i = h (key);
-		if(i<split){ //if hashed to bucket % < than split pt, these are buckets which are hi-res
-			i=h2(key);
-		}
+        int i = h (key);
+        if(i<split) {
+            i=h2(key);
+        }
+        Bucket temp = hTable.get(i);
+        if( temp.nKeys < SLOTS ){ 
+        	temp.key[temp.nKeys] = key;
+            temp.value[temp.nKeys] = value;
+            temp.nKeys++;
+        }
+     
+        else{ 
+        	hTable.add(new Bucket(null));
+        	while(temp.next != null){
+        		temp = temp.next;
+        	}
+        	
+        	if(temp.nKeys < SLOTS){
+        		temp.key[temp.nKeys] = key;
+        		temp.value[temp.nKeys] = value;
+        		temp.nKeys++;
+        	}
+        	else{
+	  		   temp.next = new Bucket(null);
+	  		   temp = temp.next;
+	  		   temp.key[temp.nKeys]=key;
+	  		   temp.value[temp.nKeys]=value;
+	  		   temp.nKeys++;
+	  	   }	
+	  	   Bucket b1 = new Bucket(null); //the new split bucket
+	  	   Bucket b2 = new Bucket(null); //temp
+	  	   temp = hTable.get(split + 1); //the original split bucket
+	  	   for(int m = 0; m<temp.nKeys; m++){
+	  		   int i2 = h2(temp.key[m]);
+	  		   if(i2 == split){//assign val to new split bucket
+	  			   if(b1.next ==null){
+	  				   b1.next = new Bucket(null);
+	  				   b1.next = b1;
+	  			   }   
+	  			   b1.key[b1.nKeys] = temp.key[m];
+	  			   b1.value[b1.nKeys] = temp.value[m];
+	  			   temp.nKeys++;
+	  		   }
+	  		   else{//assign val to second new split bucket
+	  			   if(b2.next==null){
+	  				   b2.next = new Bucket(null);
+	  				   b2 =  b2.next;
+	  			   }
+	  			   b2.key[b2.nKeys] = temp.key[m];
+	  			   b2.value[b2.nKeys] = temp.value[m];  	
+	  		   }
+	  	   }
 
-		Bucket temp = hTable.get(i);
-
-		if( temp.nKeys < SLOTS ){
-			count++;
-			temp.key[temp.nKeys] = key;
-			temp.value[temp.nKeys] = value;
-			temp.nKeys++;
-		}
-
-		else {
-			count++;
-			while(temp.next != null) {
-				temp = temp.next;
-			}
-
-			if( temp.nKeys < SLOTS ){
-				temp.key[temp.nKeys] = key;
-				temp.value[temp.nKeys] = value;
-				temp.nKeys++;
-			} else {
-				temp.next = new Bucket(null);
-				temp=temp.next;
-				temp.key[temp.nKeys] = key;
-				temp.value[temp.nKeys] = value;
-				temp.nKeys++;
-			}
-			Bucket b1 =new Bucket(null);
-			Bucket b2 = new Bucket(null);
-			temp = hTable.get(split);
-
-			do {
-				for(int j =0; j< temp.nKeys;j++) {
-					int i2 = h2(temp.key[j]);
-					if(i2 == split){
-						b1.key[b1.nKeys] = temp.key[j];
-						b1.value[b1.nKeys] = temp.value[j];
-						b1.nKeys++;
-					}
-					else{
-						b2.key[b2.nKeys] = temp.key[j];
-						b2.value[b2.nKeys] = temp.value[j];
-						b2.nKeys++;
-					}
-				}
-				temp = temp.next;
-			} while (temp!= null);
-			hTable.remove(split);
-			hTable.add(split, b1);
-			hTable.add(b2);
-			if(split == mod1-1) {
-				split=0;
-				mod1=mod1*2;
-				mod2=mod2*2;
-			}
-			else {
-				split++;
-			}
-		}
-		return null;
+	  	   if(split == mod1-1){//holds new split index
+	  		   split = 0;
+	  		   mod1 = mod1*2;
+	  		   mod2 = mod1*2;
+	  	   }
+	  	   else{//next bucket is new split
+	  		   split++;
+	  	   }
+        }    	
+        return null;
 	} // put
 
 	/********************************************************************************
