@@ -75,9 +75,9 @@ public class KeyType
      */
     public int hashCode ()
     {
-        int sum = 0;
-        for (int i = 0; i < key.length; i++) sum = 7 * sum + key [i].hashCode ();
-        return sum;
+        int sum = 17;
+        for (int i = 0; i < key.length; i++) sum = 31 * sum + key [i].hashCode ();
+        return Math.abs(sum);
     } // hashCode
 
     /*************************************************************************************
