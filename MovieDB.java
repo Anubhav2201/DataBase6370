@@ -86,12 +86,12 @@ class MovieDB {
         for (int i = 0; i < resultTest.length; i++) {
             out.println (tables [i]);
             for (int j = 0; j < resultTest [i].length; j++) {
-                for (int k=0; k<resultTest[i][j].length; k++) {
-                    out.print(resultTest[k] + ",");
-                    Comparable [] result1 = resultTest[i][k];
+       //         for (int k=0; k<resultTest[i][j].length; k++) {
+       //             out.print(resultTest[k] + ",");
+                    Comparable [] result1 = resultTest[i][j];
                     list.get(i).insert(result1);
                  //
-                } // for
+      //          } // for
                 out.println ();
             } // for
             out.println ();
