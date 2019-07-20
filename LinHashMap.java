@@ -20,7 +20,7 @@ implements Serializable, Cloneable, Map <K, V>
 {
 	/** The number of slots (for key-value pairs) per bucket.
 	 */
-	private static final int SLOTS = 10;
+	private static final int SLOTS = 4;
 
 	/** The class for type K.
 	 */
@@ -81,7 +81,7 @@ implements Serializable, Cloneable, Map <K, V>
 		classK = _classK;
 		classV = _classV;
 		hTable = new ArrayList <> ();
-		mod1   = 32;                        // initSize;
+		mod1   = 4;                        // initSize;
 		mod2   = 2 * mod1;
 		// adding no. of buckets initially to start with
 		for(int i = 0;i < mod1;i++){
@@ -118,12 +118,12 @@ implements Serializable, Cloneable, Map <K, V>
 	public V get (Object key)
 	{
 		int i = h (key);
-		if(i<split){ //if hashed to bucket % < than split pt, these are buckets which are hi-res
-			i=h2(key);
-		}  
+//		if(i<split){ //if hashed to bucket % < than split pt, these are buckets which are hi-res
+//			i=h2(key);
+//		}  
 		Bucket temp = hTable.get(i);
 		while (temp != null) {    			
-			for (int x = 0; x < SLOTS; x++) {
+			for (int x = 0; x < temp.nKeys; x++) {
 				if (key.equals(temp.key[x])) {
 					return temp.value[x];
 				}
@@ -202,9 +202,10 @@ implements Serializable, Cloneable, Map <K, V>
 	  	   else{//next bucket is new split
 	  		   split++;
 	  	   }
-        }    	
-        return null;
-	} // put
+        }   
+        // implementation-----
+    	
+        return null;} // put
 
 	/********************************************************************************
 	 * Return the size (SLOTS * number of home buckets) of the hash table. 
@@ -251,7 +252,7 @@ implements Serializable, Cloneable, Map <K, V>
 	 */
 	private int h2 (Object key)
 	{
-		return key.hashCode () % mod2;
+		return (key.hashCode () & 0x7fffffff) % mod2;
 	} // h2
 
 	/********************************************************************************
