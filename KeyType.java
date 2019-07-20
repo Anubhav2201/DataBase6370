@@ -1,6 +1,4 @@
 package p4;
-
-
 /*****************************************************************************************
  * @file  KeyType.java
  *
@@ -76,7 +74,7 @@ public class KeyType
     public int hashCode ()
     {
         int sum = 17;
-        for (int i = 0; i < key.length; i++) sum = 31 * sum + key [i].hashCode ();
+        for (int i = 0; i < key.length; i++) sum = 31 * sum + Math.abs(key [i].hashCode ());
         return Math.abs(sum);
     } // hashCode
 
@@ -90,7 +88,7 @@ public class KeyType
         for (int i = 0; i < key.length; i++) s += " " + key [i];
         return s + (" )");
     } // toString
-    
+
     /*************************************************************************************
      * The main method is used for testing purposes only.
      * @param args  the command-line arguments
