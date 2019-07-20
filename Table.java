@@ -35,7 +35,7 @@ public class Table
 {
     /** Relative path for storage directory
      */
-    private static final String DIR = "store" + File.separator;
+    private static final String DIR = "D:\\\\DataBase\\\\DB workspace\\\\project3\\\\src\\\\main\\\\java\\\\project3" + File.separator;
 
     /** Filename extension for database files
      */
@@ -208,13 +208,14 @@ public class Table
         out.println ("RA> " + name + ".select (" + keyVal + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //rows.add(bpIndex.get(keyVal));
+      //    rows.add(index.get(keyVal));
+      //  rows.add(bpIndex.get(keyVal));
         rows.add(linIndex.get(keyVal));
 
         return new Table (name + count++, attribute, domain, key, rows);
         
     } // select
+    
 
     /************************************************************************************
      * Union this table and table.  Check that the two tables are compatible.
@@ -318,12 +319,41 @@ public class Table
         int[] matchedColIndex2 = match(u_attrs);
 
         tuples.forEach(tab1->rows.addAll(table.tuples.stream().filter(tab2->areEqual(tab1,matchedColIndex1,tab2,matchedColIndex2)).map(_row->concat(tab1,_row)).collect(Collectors.toList())));
+       // tuples.forEach(tab1 -> rows.addAll(table.tuples));
 
-
+      //  table.bpIndex
         return new Table (name + count++, ArrayUtil.concat (attribute, table.attribute),
                 ArrayUtil.concat (domain, table.domain), key, rows);
     } // join
 
+    
+    public Table join1 (String attributes1, String attributes2, Table table)
+    {
+        out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
+                                               + table.name + ")");
+
+        String [] t_attrs = attributes1.split (" ");
+        String [] u_attrs = attributes2.split (" ");
+        List <Comparable []> rows = new ArrayList <> ();
+        List <Comparable []> rowsIntermediate = new ArrayList <> ();
+
+		for (Map.Entry<KeyType, Comparable[]> e : linIndex.entrySet()) {
+			Comparable[] row1 = e.getValue();
+			Comparable[] row2 = table.linIndex.get(new KeyType(extract(e.getValue(), t_attrs)));
+			if(row2!=null) {
+				rowsIntermediate.add(concat(row1, row2));
+			}
+		}
+        List<String> matchedAttribute = Arrays.asList(attribute).stream().filter(a->Arrays.asList(table.attribute).contains(a)).collect(Collectors.toList());
+        List<String> unMatchedAttributeTable1 = Arrays.asList(attribute).stream().filter(a->!Arrays.asList(table.attribute).contains(a)).collect(Collectors.toList());
+        List<String> unMatchedAttributetable = Arrays.asList(table.attribute).stream().filter(a->!Arrays.asList(attribute).contains(a)).collect(Collectors.toList());
+        int length = (matchedAttribute.size()+unMatchedAttributeTable1.size()+unMatchedAttributetable.size());
+        String[] finalAttributes = concatenateLists(matchedAttribute,unMatchedAttributeTable1,unMatchedAttributetable).toArray(new String[length]);
+        rows=rowsIntermediate.stream().map(row->extract(row, finalAttributes)).collect(Collectors.toList());
+        
+        return new Table (name + count++, ArrayUtil.concat (attribute, table.attribute),
+                                          ArrayUtil.concat (domain, table.domain), key, rows);
+    }
     /************************************************************************************
      * Join this table and table by performing an "natural join".  Tuples from both tables
      * are compared requiring common attributes to be equal.  The duplicate column is also
@@ -451,8 +481,8 @@ public class Table
             Comparable [] keyVal = new Comparable [key.length];
             int []        cols   = match (key);
             for (int j = 0; j < keyVal.length; j++) keyVal [j] = tup [cols [j]];
-            index.put (new KeyType (keyVal), tup);
-            bpIndex.put (new KeyType (keyVal), tup);
+        //    index.put (new KeyType (keyVal), tup);
+        //      bpIndex.put (new KeyType (keyVal), tup);
             linIndex.put(new KeyType (keyVal), tup);
             return true;
         } else {
@@ -487,7 +517,8 @@ public class Table
         out.println ("-|");
         for (Comparable [] tup : tuples) {
             out.print ("| ");
-            for (Comparable attr : tup) out.printf ("%15s", attr);
+            for (Comparable attr : tup) 
+            	out.printf ("%15s", attr);
             out.println (" |");
         } // for
         out.print ("|-");
@@ -590,7 +621,7 @@ public class Table
                 } // for
             } // for
             if ( ! matched) {
-                out.println ("match: domain not found for " + column [j]);
+  //              out.println ("match: domain not found for " + column [j]);
             } // if
         } // for
 
